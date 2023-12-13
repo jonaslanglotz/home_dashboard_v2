@@ -2,10 +2,16 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { env } from './env'
 
-import { log } from './log'
-import { DashboardWebSocketServer } from './web-socket-server/web-socket-server'
+import { log } from './utils/log'
+import { WebSocketBroadcaster } from './websocket-distributor'
+import { DataModel } from './data/data-model'
 
 log.info('Starting dashboard server')
 
-const webSocketServer = new DashboardWebSocketServer({ port: env.WEBSOCKET_SERVER_PORT })
-webSocketServer.start()
+const webSocketDistributor = new WebSocketBroadcaster({ port: env.WEBSOCKET_SERVER_PORT })
+webSocketDistributor.start()
+
+const dataModel = new DataModel()
+dataModel.on('data', (type: string, data: any) => {
+  webSocketDistributor.distributeMessage({ type, data })
+})

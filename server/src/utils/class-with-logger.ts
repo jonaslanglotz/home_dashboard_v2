@@ -1,10 +1,10 @@
 import type pino from 'pino'
-import { log } from '../log'
+import { log } from './log'
 
 export class WithLogger {
-  log: pino.Logger
+  readonly _log: pino.Logger
 
   constructor () {
-    this.log = log.child({ module: this.constructor.name })
+    this._log = log.child({ module: this.constructor.name })
   }
 }
