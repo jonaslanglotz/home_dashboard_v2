@@ -1,5 +1,6 @@
 import 'dotenv/config'
-import dist = require('envalid')
+import { cleanEnv, num } from 'envalid'
 
-export const env = dist.cleanEnv(process.env, {
+export const env = cleanEnv(process.env, {
+  WEBSOCKET_SERVER_PORT: num()
 })
