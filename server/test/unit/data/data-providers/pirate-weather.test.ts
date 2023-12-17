@@ -8,16 +8,6 @@ import { type WeatherData } from '../../../../../shared-types'
 chai.use(chaiAsPromised)
 
 describe('PirateWeatherDataProvider', function () {
-  let subject: PirateWeatherDataProvider
-
-  beforeEach('setup', () => {
-    subject = new PirateWeatherDataProvider({
-      apiKey: 'apikey',
-      latitude: 10.1,
-      longitude: -5.5
-    })
-  })
-
   const validAPIResponse: APIResponse = {
     // @ts-expect-error Non complete, only required info
     currently: {
@@ -75,13 +65,20 @@ describe('PirateWeatherDataProvider', function () {
     )
   }
 
+  let subject: PirateWeatherDataProvider
   let fetchStub: SinonStub
 
-  this.beforeEach(function () {
+  beforeEach('setup', () => {
+    subject = new PirateWeatherDataProvider({
+      apiKey: 'apikey',
+      latitude: 10.1,
+      longitude: -5.5
+    })
+
     fetchStub = sinon.stub(global, 'fetch')
   })
 
-  this.afterEach(function () {
+  afterEach(function () {
     fetchStub.restore()
   })
 
