@@ -1,7 +1,8 @@
-import { env } from './env'
-import { WithLogger } from './utils/class-with-logger'
+import { env } from '../env'
 
-import { type WebSocket, WebSocketServer } from 'ws'
+import { type WebSocket, WebSocketServer, EventEmitter } from 'ws'
+import { logger } from '../utils/log'
+import type pino from 'pino'
 
 /**
  * A WebSocket server that can broadcast messages to all connected clients.
@@ -9,12 +10,16 @@ import { type WebSocket, WebSocketServer } from 'ws'
  * @export
  * @class WebSocketBroadcaster
  * @extends {WithLogger}
+ * @extends {EventEmitter}
  */
-export class WebSocketBroadcaster extends WithLogger {
+export class WebSocketBroadcaster extends EventEmitter {
+  static readonly NEW_CONNECTION_EVENT: 'NEW_CONNECTION_EVENT'
+
   port: number
 
   #server: WebSocketServer | undefined
   readonly #sessions: WebSocket[] = []
+  _log: pino.Logger
 
   /**
    * Creates an instance of WebSocketBroadcaster.
@@ -26,6 +31,8 @@ export class WebSocketBroadcaster extends WithLogger {
     super()
 
     this.port = options.port
+
+    this._log = logger.child({ module: this.constructor.name })
   }
 
   /**
@@ -57,6 +64,7 @@ export class WebSocketBroadcaster extends WithLogger {
    * @memberof WebSocketBroadcaster
    */
   distributeMessage (message: Record<string, any>): void {
+    this._log.info(`Distributing message to ${this.#sessions.length} websocket connections`)
     const stringifiedMessage = JSON.stringify(message)
     this.#sessions.forEach(session => {
       session.send(stringifiedMessage)
@@ -78,6 +86,8 @@ export class WebSocketBroadcaster extends WithLogger {
       })
 
       this.#sessions.push(session)
+
+      this.emit(WebSocketBroadcaster.NEW_CONNECTION_EVENT, (message: any) => { session.send(JSON.stringify(message)) })
     })
   }
 }
