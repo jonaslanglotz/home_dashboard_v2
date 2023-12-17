@@ -12,11 +12,15 @@ import { logger } from '../utils/log'
  * @template T
  */
 export class IntervalBasedDataProvider<T> extends EventEmitter {
+  static readonly DATA_EVENT = 'data'
+
   dataProvider: DataProvider<T>
 
   _log: pino.Logger
+  _interval: number
+
   _isGettingData: boolean
-  _timeout: NodeJS.Timeout
+  _timeout: NodeJS.Timeout | undefined
 
   /**
    * Creates an instance of IntervalBasedDataProvider.
@@ -29,16 +33,26 @@ export class IntervalBasedDataProvider<T> extends EventEmitter {
 
     this.dataProvider = dataProvider
 
+    this._interval = interval
     this._log = logger.child({ module: this.constructor.name })
+
     this._isGettingData = false
+  }
 
-    this._timeout = setInterval(() => {
-      if (this._isGettingData) { return }
+  start (): void {
+    this._getAndEmitData()
+      .then(() => {
+        this._timeout = setInterval(() => {
+          if (this._isGettingData) { return }
 
-      this._isGettingData = true
-      void this._getAndEmitData()
-      this._isGettingData = false
-    }, interval)
+          this._isGettingData = true
+          void this._getAndEmitData()
+          this._isGettingData = false
+        }, this._interval)
+      })
+      .catch(error => {
+        throw error
+      })
   }
 
   stop (): void {
@@ -47,8 +61,9 @@ export class IntervalBasedDataProvider<T> extends EventEmitter {
 
   async _getAndEmitData (): Promise<void> {
     try {
-      const data = this.dataProvider.getData()
-      this.emit('data', data)
+      this._log.info(`Fetching data from ${this.dataProvider.constructor.name}`)
+      const data = await this.dataProvider.getData()
+      this.emit(IntervalBasedDataProvider.DATA_EVENT, data)
     } catch (error) {
       this._log.error({ error }, `#getData of ${this.dataProvider.constructor.name} failed with error`)
     }
