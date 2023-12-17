@@ -11,3 +11,11 @@ export interface WeatherData {
   highTemperature: number,
   lowTemperature: number
 }
+
+export interface Task {
+  title: string
+  due?: string
+  priority: number
+}
+
+export type Tasks = Task[]
