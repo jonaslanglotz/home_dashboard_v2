@@ -22,7 +22,7 @@ function setupDataBroadcast (dataModel: DataModel, webSocketBroadcaster: WebSock
 function setupDataRetransmissionOnConnect (dataModel: DataModel, webSocketBroadcaster: WebSocketBroadcaster): void {
   webSocketBroadcaster.on(WebSocketBroadcaster.NEW_CONNECTION_EVENT, (sendMessage) => {
     log.info('New WebSocket connection, retransmitting current data')
-    const dataState = dataModel.getCurrentState()
+    const dataState = dataModel.currentState
 
     for (const [type, data] of Object.entries(dataState)) {
       if (data == null) { continue }

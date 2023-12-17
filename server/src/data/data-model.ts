@@ -6,10 +6,12 @@ import type pino from 'pino'
 import { PirateWeatherDataProvider } from './data-providers/pirate-weather'
 import { env } from '../env'
 import { IntervalBasedDataProvider } from './interval-based-data-provider'
-import { type WeatherData } from '../../../shared-types'
+import { type Tasks, type WeatherData } from '../../../shared-types'
+import { TodoistTasksProvider } from './data-providers/todoist'
 
 interface DataState {
-  WEATHER: WeatherData | undefined
+  WEATHER?: WeatherData
+  TASKS?: Tasks
 }
 
 /**
@@ -24,40 +26,46 @@ export class DataModel extends EventEmitter {
 
   readonly _log: pino.Logger
 
-  weatherProvider: IntervalBasedDataProvider<WeatherData> | undefined
-  lastWeatherData: WeatherData | undefined
+  currentState: DataState = {}
+
+  dataProviders: Record<keyof DataState, IntervalBasedDataProvider<any>>
 
   constructor () {
     super()
 
     this._log = logger.child({ module: this.constructor.name })
+
+    this.dataProviders = {
+      WEATHER: new IntervalBasedDataProvider(
+        new PirateWeatherDataProvider({
+          apiKey: env.PIRATE_WEATHER_API_KEY,
+          latitude: env.LATITUDE,
+          longitude: env.LONGITUDE
+        }),
+        env.WEATHER_DATA_FETCH_INTERVAL * 1000
+      ),
+      TASKS: new IntervalBasedDataProvider(
+        new TodoistTasksProvider({
+          apiKey: env.TODOIST_API_KEY,
+          projectId: env.TODOIST_PROJECT_ID
+        }),
+        env.TASKS_FETCH_INTERVAL * 1000
+      )
+    }
+
+    this._connectDataProviders()
   }
 
   start (): void {
-    this._startWeatherProvider()
+    Object.values(this.dataProviders).forEach(dataProvider => { dataProvider.start() })
   }
 
-  getCurrentState (): DataState {
-    return {
-      WEATHER: this.lastWeatherData
+  _connectDataProviders (): void {
+    for (const [type, dataProvider] of Object.entries(this.dataProviders)) {
+      dataProvider.on(IntervalBasedDataProvider.DATA_EVENT, data => {
+        this.currentState[type as keyof typeof this.dataProviders] = data
+        this.emit(DataModel.DATA_EVENT, type, data)
+      })
     }
-  }
-
-  _startWeatherProvider (): void {
-    this.weatherProvider = new IntervalBasedDataProvider(
-      new PirateWeatherDataProvider({
-        apiKey: env.PIRATE_WEATHER_API_KEY,
-        latitude: env.LATITUDE,
-        longitude: env.LONGITUDE
-      }),
-      env.WEATHER_DATA_FETCH_INTERVAL * 1000
-    )
-
-    this.weatherProvider.on(IntervalBasedDataProvider.DATA_EVENT, data => {
-      this.lastWeatherData = data
-      this.emit(DataModel.DATA_EVENT, 'WEATHER', data)
-    })
-
-    this.weatherProvider.start()
   }
 }
