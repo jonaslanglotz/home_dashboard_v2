@@ -14,7 +14,7 @@ The backend regularly fetches data from various sources and broadcasts it to con
 
 ## Contributing
 
-As this s a personal project, that currently does not feature configurable customization, I can't accept any pull requests. Feel free to fork the project and customize it for yourself.
+As this is a personal project, that currently does not feature configurable customization, I can't accept any pull requests. Feel free to fork the project and customize it for yourself.
 
 ## License
 
