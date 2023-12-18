@@ -19,3 +19,11 @@ export interface Task {
 }
 
 export type Tasks = Task[]
+
+export interface Event {
+  name: string
+  date: string
+  hasTime: boolean
+}
+
+export type Events = Event[]
