@@ -12,7 +12,7 @@ export const env = cleanEnv(process.env, {
   TODOIST_PROJECT_ID: str(),
 
   ICAL_CALENDAR_URL: str(),
-  ICAL_RECURRENCE_INTERVAL: num(),
+  ICAL_EVENT_TIME_SPAN_DAYS: num(),
 
   WEATHER_DATA_FETCH_INTERVAL: num(),
   TASKS_FETCH_INTERVAL: num(),

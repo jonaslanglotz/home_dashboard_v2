@@ -4,7 +4,7 @@ import { IcalEventsProvider } from '../../../../src/data/data-providers/ical'
 
 const env = cleanEnv(process.env, {
   ICAL_CALENDAR_URL: str(),
-  ICAL_RECURRENCE_INTERVAL: num()
+  ICAL_EVENT_TIME_SPAN_DAYS: num()
 })
 
 describe('IcalEventsProvider', function () {
@@ -13,7 +13,7 @@ describe('IcalEventsProvider', function () {
   beforeEach('setup', () => {
     subject = new IcalEventsProvider({
       calendarUrl: env.ICAL_CALENDAR_URL,
-      recurrenceInterval: env.ICAL_RECURRENCE_INTERVAL
+      eventTimeSpanDays: env.ICAL_EVENT_TIME_SPAN_DAYS
     })
   })
 

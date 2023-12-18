@@ -56,7 +56,7 @@ export class DataModel extends EventEmitter {
       EVENTS: new IntervalBasedDataProvider(
         new IcalEventsProvider({
           calendarUrl: env.ICAL_CALENDAR_URL,
-          recurrenceInterval: env.ICAL_RECURRENCE_INTERVAL
+          eventTimeSpanDays: env.ICAL_EVENT_TIME_SPAN_DAYS
         }),
         env.EVENTS_FETCH_INTERVAL * 1000
       )

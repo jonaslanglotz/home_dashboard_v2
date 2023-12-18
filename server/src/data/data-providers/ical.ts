@@ -5,7 +5,7 @@ import Ical from 'node-ical'
 
 interface Options {
   calendarUrl: string
-  recurrenceInterval: number
+  eventTimeSpanDays: number
 }
 
 function shiftDateByDays (date: Date, days: number): Date {
@@ -15,20 +15,20 @@ function shiftDateByDays (date: Date, days: number): Date {
 
 export class IcalEventsProvider extends DataProvider<Events> {
   calendarUrl: string
-  recurrenceInterval: number
+  eventTimeSpanDays: number
 
   constructor (options: Options) {
     super()
 
     this.calendarUrl = options.calendarUrl
-    this.recurrenceInterval = options.recurrenceInterval
+    this.eventTimeSpanDays = options.eventTimeSpanDays
   }
 
   async getData (): Promise<Events> {
     const icalData = await this._getIcalData()
     const rawEvents = this._parseIcalData(icalData)
 
-    return rawEvents.flatMap(rawEvent => this._convertRawEvent(rawEvent))
+    return rawEvents.flatMap(rawEvent => this._filterAndConvertRawEvent(rawEvent))
   }
 
   async _getIcalData (): Promise<string> {
@@ -51,8 +51,15 @@ export class IcalEventsProvider extends DataProvider<Events> {
     return calendarComponents.filter(calendarComponent => calendarComponent.type === 'VEVENT') as Ical.VEvent[]
   }
 
-  _convertRawEvent (rawEvent: Ical.VEvent): Event[] {
+  _filterAndConvertRawEvent (rawEvent: Ical.VEvent): Event[] {
+    const startOfTimeSpan = shiftDateByDays(new Date(), -this.eventTimeSpanDays)
+    const endOfTimeSpan = shiftDateByDays(new Date(), this.eventTimeSpanDays)
+
     if (rawEvent.rrule == null) {
+      if (rawEvent.start < startOfTimeSpan || rawEvent.end > endOfTimeSpan) {
+        return []
+      }
+
       return [{
         name: rawEvent.summary,
         date: rawEvent.start.toISOString(),
@@ -60,10 +67,7 @@ export class IcalEventsProvider extends DataProvider<Events> {
       }]
     }
 
-    const startOfInterval = shiftDateByDays(new Date(), -this.recurrenceInterval)
-    const endOfInterval = shiftDateByDays(new Date(), this.recurrenceInterval)
-
-    const dates = rawEvent.rrule.between(startOfInterval, endOfInterval)
+    const dates = rawEvent.rrule.between(startOfTimeSpan, endOfTimeSpan)
 
     return dates.map(date => ({
       name: rawEvent.summary,

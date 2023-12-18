@@ -118,7 +118,7 @@ END:VCALENDAR`
   beforeEach('setup', () => {
     subject = new IcalEventsProvider({
       calendarUrl: 'http://calendar.url',
-      recurrenceInterval: 3
+      eventTimeSpanDays: 3
     })
 
     fetchStub = sinon.stub(global, 'fetch')
