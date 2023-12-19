@@ -84,7 +84,7 @@ export class IcalEventsProvider extends DataProvider<Events> {
     if (this._rawEventHasTime(rawEvent)) {
       if (rawEvent.rrule != null) {
         dates.push(...rawEvent.rrule.between(relevanceStart, relevanceEnd))
-      } else if (rawEvent.start > relevanceStart) {
+      } else if (rawEvent.start > relevanceStart && rawEvent.start < relevanceEnd) {
         dates.push(rawEvent.start)
       }
     } else {

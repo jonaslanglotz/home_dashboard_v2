@@ -253,6 +253,22 @@ END:VEVENT`)
         hasTime: false
       })))
     })
+
+    it('should ignore an event outside of the configured time span', async function () {
+      const icalData = inCalendar(`BEGIN:VEVENT
+DTSTAMP:20231218T010638Z
+UID:1702861466053-54879@ical.marudot.com
+DTSTART;TZID=Europe/Berlin:20231228T120000
+DTEND;TZID=Europe/Berlin:20231228T130000
+SUMMARY:One-Time Event
+END:VEVENT`)
+
+      fetchStub.onFirstCall().returns(positiveResponse(icalData))
+
+      const value = await subject.getData()
+
+      assert.deepEqual(value, [])
+    })
   })
 
   describe('#getData', function () {
