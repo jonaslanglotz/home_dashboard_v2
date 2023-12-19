@@ -6,12 +6,14 @@ import type pino from 'pino'
 import { PirateWeatherDataProvider } from './data-providers/pirate-weather'
 import { env } from '../env'
 import { IntervalBasedDataProvider } from './interval-based-data-provider'
-import { type Tasks, type WeatherData } from '../../../shared-types'
+import { type Events, type Tasks, type WeatherData } from '../../../shared-types'
 import { TodoistTasksProvider } from './data-providers/todoist'
+import { IcalEventsProvider } from './data-providers/ical'
 
 interface DataState {
   WEATHER?: WeatherData
   TASKS?: Tasks
+  EVENTS?: Events
 }
 
 /**
@@ -50,6 +52,13 @@ export class DataModel extends EventEmitter {
           projectId: env.TODOIST_PROJECT_ID
         }),
         env.TASKS_FETCH_INTERVAL * 1000
+      ),
+      EVENTS: new IntervalBasedDataProvider(
+        new IcalEventsProvider({
+          calendarUrl: env.ICAL_CALENDAR_URL,
+          eventTimeSpanDays: env.ICAL_EVENT_TIME_SPAN_DAYS
+        }),
+        env.EVENTS_FETCH_INTERVAL * 1000
       )
     }
 
