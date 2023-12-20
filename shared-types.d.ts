@@ -37,3 +37,10 @@ export interface TrainDeparture {
   time: string,
   plannedTime: string
 }
+
+export interface EnergyPrice {
+  time: string,
+  price: number
+}
+
+export type EnergyPrices = Array<EnergyPrice>
