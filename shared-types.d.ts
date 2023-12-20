@@ -27,3 +27,13 @@ export interface Event {
 }
 
 export type Events = Event[]
+
+export type TrainDepartures = TrainDeparture[]
+
+export interface TrainDeparture {
+  destination: string,
+  direction: string,
+  line: string,
+  time: string,
+  plannedTime: string
+}

@@ -6,14 +6,16 @@ import type pino from 'pino'
 import { PirateWeatherDataProvider } from './data-providers/pirate-weather'
 import { env } from '../env'
 import { IntervalBasedDataProvider } from './interval-based-data-provider'
-import { type Events, type Tasks, type WeatherData } from '../../../shared-types'
+import { type TrainDepartures, type Events, type Tasks, type WeatherData } from '../../../shared-types'
 import { TodoistTasksProvider } from './data-providers/todoist'
 import { IcalEventsProvider } from './data-providers/ical'
+import { BvgTrainDeparturesProvider } from './data-providers/bvg'
 
 interface DataState {
   WEATHER?: WeatherData
   TASKS?: Tasks
   EVENTS?: Events
+  TRAIN_DEPARTURES?: TrainDepartures
 }
 
 /**
@@ -59,6 +61,13 @@ export class DataModel extends EventEmitter {
           eventTimeSpanDays: env.ICAL_EVENT_TIME_SPAN_DAYS
         }),
         env.EVENTS_FETCH_INTERVAL * 1000
+      ),
+      TRAIN_DEPARTURES: new IntervalBasedDataProvider(
+        new BvgTrainDeparturesProvider({
+          stationId: env.BVG_STATION_ID,
+          departureTimeSpanMinutes: env.BVG_DEPARTURE_TIME_SPAN_MINUTES
+        }),
+        env.TRAIN_DEPARTURES_FETCH_INTERVAL * 1000
       )
     }
 
