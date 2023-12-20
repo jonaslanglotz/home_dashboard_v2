@@ -14,7 +14,11 @@ export const env = cleanEnv(process.env, {
   ICAL_CALENDAR_URL: str(),
   ICAL_EVENT_TIME_SPAN_DAYS: num(),
 
+  BVG_STATION_ID: str(),
+  BVG_DEPARTURE_TIME_SPAN_MINUTES: num(),
+
   WEATHER_DATA_FETCH_INTERVAL: num(),
   TASKS_FETCH_INTERVAL: num(),
-  EVENTS_FETCH_INTERVAL: num()
+  EVENTS_FETCH_INTERVAL: num(),
+  TRAIN_DEPARTURES_FETCH_INTERVAL: num()
 })
