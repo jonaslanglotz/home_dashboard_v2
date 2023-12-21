@@ -6,16 +6,18 @@ import type pino from 'pino'
 import { PirateWeatherDataProvider } from './data-providers/pirate-weather'
 import { env } from '../env'
 import { IntervalBasedDataProvider } from './interval-based-data-provider'
-import { type TrainDepartures, type Events, type Tasks, type WeatherData } from '../../../shared-types'
+import { type TrainDepartures, type Events, type Tasks, type WeatherData, type EnergyPrices } from '../../../shared-types'
 import { TodoistTasksProvider } from './data-providers/todoist'
 import { IcalEventsProvider } from './data-providers/ical'
 import { BvgTrainDeparturesProvider } from './data-providers/bvg'
+import { TibberEnergyPricesProvider } from './data-providers/tibber'
 
 interface DataState {
   WEATHER?: WeatherData
   TASKS?: Tasks
   EVENTS?: Events
   TRAIN_DEPARTURES?: TrainDepartures
+  ENERGY_PRICES?: EnergyPrices
 }
 
 /**
@@ -68,6 +70,12 @@ export class DataModel extends EventEmitter {
           departureTimeSpanMinutes: env.BVG_DEPARTURE_TIME_SPAN_MINUTES
         }),
         env.TRAIN_DEPARTURES_FETCH_INTERVAL * 1000
+      ),
+      ENERGY_PRICES: new IntervalBasedDataProvider(
+        new TibberEnergyPricesProvider({
+          apiKey: env.TIBBER_API_KEY
+        }),
+        env.ENERGY_PRICES_FETCH_INTERVAL * 1000
       )
     }
 
