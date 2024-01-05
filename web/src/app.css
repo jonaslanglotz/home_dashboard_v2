@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  font-size: 1.7vw;
+}
+
 /* Fonts */
 
 /* montserrat-100 - latin */
