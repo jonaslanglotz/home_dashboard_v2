@@ -1,8 +1,8 @@
 <script lang="ts">
  import { onDestroy } from 'svelte'
 
-	let time: String;
-	let date: String;
+	let time: string
+	let date: string
 
   const getTime = () => (new Date()).toLocaleString('de-DE', { hour: '2-digit', minute: '2-digit' })
 
