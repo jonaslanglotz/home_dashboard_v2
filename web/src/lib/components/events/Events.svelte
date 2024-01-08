@@ -52,7 +52,7 @@
 </script>
 
 <div class="flex flex-col py-2 bg-slate-100 rounded-2xl overflow-hidden">
-  <span class="text-center font-serif text-xl text-slate-700">Termine</span>
+  <span class="text-center font-serif -mt-1 mb-1 text-xl text-slate-700">Termine</span>
   <div class="hide-scrollbar overflow-auto">
     {#each Object.keys(groupedEvents).sort() as dateString}
       {@const eventsOnDay = (groupedEvents[dateString] ?? []).sort(sortEventsByHasTime)}

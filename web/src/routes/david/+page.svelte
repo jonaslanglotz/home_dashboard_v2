@@ -2,8 +2,10 @@
     import Clock from '$lib/components/Clock.svelte'
     import Weather from '$lib/components/weather/Weather.svelte'
     import EventsComponent from '$lib/components/events/Events.svelte'
-    import { eventsStore, weatherDataStore } from '$lib/stores'
-    import type { WeatherData, Events } from '../../../../shared-types'
+    import TrainDeparturesComponent from '$lib/components/trainDepartures/TrainDepartures.svelte'
+
+    import { eventsStore, weatherDataStore, trainDeparturesStore } from '$lib/stores'
+    import type { WeatherData, Events, TrainDepartures } from '../../../../shared-types'
 
     let weatherData: WeatherData | undefined
     weatherDataStore.subscribe(value => {
@@ -13,6 +15,11 @@
     let events: Events | undefined
     eventsStore.subscribe(value => {
       events = value
+    })
+
+    let trainDepartures: TrainDepartures | undefined
+    trainDeparturesStore.subscribe(value => {
+      trainDepartures = value
     })
 </script>
 
@@ -24,7 +31,7 @@
     </div>
     <div class="grid grid-cols-2 gap-4 min-h-0">
       <EventsComponent {events}/>
-      <placeholder />
+      <TrainDeparturesComponent {trainDepartures} lines={['S5', 'RB26']}/>
     </div>
   </div>
 </div>
