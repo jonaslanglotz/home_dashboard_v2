@@ -121,6 +121,35 @@ END:VEVENT`)
       }])
     })
 
+    it('should correctly parse a recurring event in defined before a DST switch', async function () {
+      const icalData = inCalendar(`BEGIN:VEVENT
+DTSTAMP:20231218T010638Z
+UID:1702861466053-54879@ical.marudot.com
+RRULE:FREQ=DAILY;INTERVAL=2
+DTSTART;TZID=Europe/Berlin:20230901T213000
+DTEND;TZID=Europe/Berlin:20230902T053000
+SUMMARY:Recurring Event
+END:VEVENT`)
+
+      fetchStub.onFirstCall().returns(positiveResponse(icalData))
+
+      const value = await subject.getData()
+
+      assert.deepEqual(value, [{
+        name: 'Recurring Event',
+        date: '2023-12-22T20:30:00.000Z',
+        hasTime: true
+      }, {
+        name: 'Recurring Event',
+        date: '2023-12-24T20:30:00.000Z',
+        hasTime: true
+      }, {
+        name: 'Recurring Event',
+        date: '2023-12-26T20:30:00.000Z',
+        hasTime: true
+      }])
+    })
+
     it('should correctly parse a one-time all-day event', async function () {
       const icalData = inCalendar(`BEGIN:VEVENT
 DTSTAMP:20231218T010638Z
