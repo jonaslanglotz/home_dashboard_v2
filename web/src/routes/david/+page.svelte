@@ -1,23 +1,30 @@
 <script lang="ts">
     import Clock from '$lib/components/Clock.svelte'
     import Weather from '$lib/components/weather/Weather.svelte'
-    import { weatherDataStore } from '$lib/stores'
-    import type { WeatherData } from '../../../../shared-types'
+    import EventsComponent from '$lib/components/events/Events.svelte'
+    import { eventsStore, weatherDataStore } from '$lib/stores'
+    import type { WeatherData, Events } from '../../../../shared-types'
 
     let weatherData: WeatherData | undefined
     weatherDataStore.subscribe(value => {
       weatherData = value
     })
+
+    let events: Events | undefined
+    eventsStore.subscribe(value => {
+      events = value
+    })
 </script>
 
-<div class="h-screen w-screen overflow-hidden bg-white text-black flex flex-row">
-	<div class="w-8/12 flex flex-col py-4 pl-4 h-full flex-shrink-0">
-		<div class="flex gap-4">
-<!-- <div class="w-screen h-screen p-4">
-  <div class="flex flex-col w-2/3 py-4">
-    <div class="flex flex-row"> -->
+<div class="w-screen h-screen p-4 overflow-hidden">
+  <div class="flex flex-col w-2/3 h-full gap-4">
+    <div class="grid grid-cols-2 gap-4">
       <Clock />
       <Weather {weatherData} horizontal={true} />
+    </div>
+    <div class="grid grid-cols-2 gap-4 min-h-0">
+      <EventsComponent {events}/>
+      <placeholder />
     </div>
   </div>
 </div>

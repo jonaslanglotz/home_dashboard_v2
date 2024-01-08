@@ -4,8 +4,8 @@
 
   import { WSConnection } from '$lib/wsConnection'
 
-  import { weatherDataStore } from '$lib/stores'
-  import type { WeatherData } from '../../../shared-types'
+  import { eventsStore, weatherDataStore } from '$lib/stores'
+  import type { WeatherData, Events } from '../../../shared-types'
 
   let ws: WSConnection | undefined
   if (browser) {
@@ -18,6 +18,11 @@
 
   ws?.addEventListener('WEATHER', ((event: CustomEvent) => {
     weatherDataStore.set(event.detail?.data as WeatherData)
+  // eslint-disable-next-line no-undef
+  }) as EventListener)
+
+  ws?.addEventListener('EVENTS', ((event: CustomEvent) => {
+    eventsStore.set(event.detail?.data as Events)
   // eslint-disable-next-line no-undef
   }) as EventListener)
 
