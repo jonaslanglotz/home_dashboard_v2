@@ -5,8 +5,8 @@
 
   interface LineColorMap { [key: string]: string }
   export const LINE_COLORS: LineColorMap = {
-    'S5': 'green-500',
-    'RB26': 'teal-400'
+    'S5': 'bg-green-500',
+    'RB26': 'bg-teal-400'
   }
 
   const minutesBetweenDates = (a: Date, b: Date) => (b.valueOf() - a.valueOf()) / (60 * 1000)
@@ -21,7 +21,6 @@
 </script>
 
 <div class="rounded-md px-2 mx-4 py-2 mb-2 flex bg-white shadow-lg items-start flex-grow">
-
   <!-- time and delay -->
   <div class="flex flex-col mt-1">
     <span class="text-xs leading-none ml-1 text-gray-700 {cancelled && 'text-red-500 line-through font-bold'}">{timeString}</span>
@@ -31,7 +30,7 @@
   <!-- line and direction -->
   <div class="flex flex-row h-full items-start">
 
-    <div class="flex { `bg-${LINE_COLORS[trainDeparture.line] ?? 'gray-400'}` } rounded-full py-0.5 px-1 ml-2 mt-0.5 items-start">
+    <div class="flex { LINE_COLORS[trainDeparture.line] ?? 'bg-gray-400' } rounded-full py-0.5 px-1 ml-2 mt-0.5 items-start">
       <span class="text-xs leading-none">{trainDeparture.line}</span>
     </div>
 
