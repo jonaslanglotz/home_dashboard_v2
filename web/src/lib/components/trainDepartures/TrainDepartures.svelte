@@ -3,7 +3,7 @@
   import TrainDepartureComponent from './TrainDeparture.svelte'
 
   export let trainDepartures: TrainDepartures | undefined
-  export let lines: string
+  export let lines: string[]
   export let maxCount = 6
 
   $: relevantDepartures = (trainDepartures ?? []).filter(d => lines.includes(d.line)).slice(undefined, maxCount)
