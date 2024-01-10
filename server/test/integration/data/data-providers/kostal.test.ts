@@ -1,17 +1,20 @@
 import 'dotenv/config'
 import { cleanEnv, num, str } from 'envalid'
-import { KostalEnergyUseProvider } from '../../../../src/data/data-providers/kostal'
+import { KostalEnergyUseDataProvider } from '../../../../src/data/data-providers/kostal'
 
-// const env = cleanEnv(process.env, {
-//   ICAL_CALENDAR_URL: str(),
-//   ICAL_EVENT_TIME_SPAN_DAYS: num()
-// })
+const env = cleanEnv(process.env, {
+  KOSTAL_MODBUS_ADDRESS: str(),
+  KOSTAL_MODBUS_PORT: num()
+})
 
 describe('KostalEnergyUseProvider', function () {
-  let subject: KostalEnergyUseProvider
+  let subject: KostalEnergyUseDataProvider
 
   beforeEach('setup', () => {
-    subject = new KostalEnergyUseProvider({})
+    subject = new KostalEnergyUseDataProvider({
+      modbusAddress: env.KOSTAL_MODBUS_ADDRESS,
+      modbusPort: env.KOSTAL_MODBUS_PORT
+    })
   })
 
   describe('#_getRawData()', function () {
@@ -28,4 +31,3 @@ describe('KostalEnergyUseProvider', function () {
     })
   })
 })
-

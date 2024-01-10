@@ -4,10 +4,16 @@ import type { EnergyUseData } from '../../../../shared-types'
 import ModbusRTU from 'modbus-serial'
 
 interface Options {
+  modbusAddress: string
+  modbusPort: number
 }
 
-export class KostalEnergyUseProvider extends DataProvider<EnergyUseData> {
+export class KostalEnergyUseDataProvider extends DataProvider<EnergyUseData> {
+  _modbusAddress: string
+  _modbusPort: number
+
   _modbusClient: ModbusRTU
+
   /**
    * Creates an instance of KostalEnergyUseProvider.
    * @param {Options} options
@@ -15,6 +21,9 @@ export class KostalEnergyUseProvider extends DataProvider<EnergyUseData> {
    */
   constructor (options: Options) {
     super()
+
+    this._modbusAddress = options.modbusAddress
+    this._modbusPort = options.modbusPort
 
     this._modbusClient = new ModbusRTU()
   }
@@ -30,7 +39,7 @@ export class KostalEnergyUseProvider extends DataProvider<EnergyUseData> {
       this._modbusClient.setID(1)
     }
 
-    const data = await this._modbusClient.readInputRegisters(40960, 52)
+    const data = await this._modbusClient.readInputRegisters(40960, 26)
     return data.data
   }
 
@@ -47,7 +56,7 @@ export class KostalEnergyUseProvider extends DataProvider<EnergyUseData> {
       batteryInputOutputWatts,
       batteryChargePercentage,
       inverterInputOutputWatts,
-      gridInputOutputWatts: -(homeConsumptionWatts - inverterInputOutputWatts)
+      gridInputOutputWatts: homeConsumptionWatts - inverterInputOutputWatts
     }
   }
 
@@ -64,7 +73,12 @@ export class KostalEnergyUseProvider extends DataProvider<EnergyUseData> {
       .flatMap(register => register.toString(2))
       .join('')
 
-    return parseInt(bits, 2)
+    // Check for two's complement
+    if (bits[0] === '0') {
+      return parseInt(bits, 2)
+    }
+
+    return -(~parseInt(bits, 2) + 1)
   }
 
   _uint32 (registers: number[]): number {
