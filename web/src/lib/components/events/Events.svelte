@@ -1,11 +1,10 @@
 <script lang="ts">
 	import type { Events, Event } from '../../../../../shared-types'
 	import EventComponent from './Event.svelte'
+  import { dateString } from '$lib/dateString'
 
   export let events: Events | undefined
 
-  const dateString = (date: Date) => date.toISOString().split('T')[0]
-  
   const shiftDateByDays = (date: Date, days: number) => {
     const shiftedDate = new Date(date)
     shiftedDate.setDate(shiftedDate.getDate() + days)
