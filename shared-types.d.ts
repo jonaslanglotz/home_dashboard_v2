@@ -44,3 +44,13 @@ export interface EnergyPrice {
 }
 
 export type EnergyPrices = Array<EnergyPrice>
+
+export interface EnergyUseData {
+  homeConsumptionWatts: number,
+  solarInputOutputsWatts: number,
+  batteryInputOutputWatts: number,
+  batteryChargePercentage: number,
+  inverterInputOutputWatts: number,
+  gridInputOutputWatts: number
+}
+

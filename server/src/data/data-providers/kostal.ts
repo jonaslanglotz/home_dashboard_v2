@@ -6,7 +6,7 @@ import ModbusRTU from 'modbus-serial'
 interface Options {
 }
 
-export class KostalEnergyUseProvider extends DataProvider<Tasks> {
+export class KostalEnergyUseProvider extends DataProvider<EnergyUseData> {
   _modbusClient: ModbusRTU
   /**
    * Creates an instance of KostalEnergyUseProvider.
@@ -20,6 +20,8 @@ export class KostalEnergyUseProvider extends DataProvider<Tasks> {
   }
 
   async getData (): Promise<EnergyUseData> {
+    const rawData = await this._getRawData()
+    return this._parseRawData(rawData)
   }
 
   async _getRawData (): Promise<number[]> {
@@ -32,7 +34,7 @@ export class KostalEnergyUseProvider extends DataProvider<Tasks> {
     return data.data
   }
 
-  async _parseRawData (rawData: number[]): EnergyUseData {
+  _parseRawData (rawData: number[]): EnergyUseData {
     const inverterInputOutputWatts = this._int32(rawData.slice(14, 16))
     const solarInputOutputsWatts = this._uint32(rawData.slice(16, 18))
     const homeConsumptionWatts = this._int32(rawData.slice(22, 24))
