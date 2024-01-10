@@ -40,9 +40,10 @@ export class WSConnection extends EventTarget {
 
   async startConnectionLoop(): Promise<void> {
     for (;;) {
+      console.log('Trying to establich websocket connection...')
       this._ws = new WebSocket(`ws://${PUBLIC_SERVER_HOST}:${PUBLIC_SERVER_WS_PORT}`)
       await this.handleConnection()
-      console.log('Lost connection with websocket server trying to reestablish.')
+      console.log('Lost connection to websocket server.')
     }
   }
 

@@ -3,9 +3,10 @@
     import Weather from '$lib/components/weather/Weather.svelte'
     import EventsComponent from '$lib/components/events/Events.svelte'
     import TrainDeparturesComponent from '$lib/components/trainDepartures/TrainDepartures.svelte'
+    import TasksComponent from '$lib/components/tasks/Tasks.svelte'
 
-    import { weatherDataStore, eventsStore, trainDeparturesStore } from '$lib/stores'
-    import type { WeatherData, Events, TrainDepartures } from '../../../../shared-types'
+    import { weatherDataStore, eventsStore, trainDeparturesStore, tasksStore } from '$lib/stores'
+    import type { WeatherData, Events, TrainDepartures, Tasks } from '../../../../shared-types'
 
     let weatherData: WeatherData | undefined
     weatherDataStore.subscribe(value => {
@@ -21,6 +22,11 @@
     trainDeparturesStore.subscribe(value => {
       trainDepartures = value
     })
+    
+    let tasks: Tasks | undefined
+    tasksStore.subscribe(value => {
+      tasks = value
+    })
 </script>
 
 <div class="w-screen h-screen flex flex-col overflow-hidden p-4 gap-4">
@@ -29,7 +35,7 @@
     <Weather {weatherData} />
   </div>
   <div class="grid grid-cols-2 auto-rows-fr gap-4 min-h-0">
-    <placeholder />
+    <TasksComponent {tasks} />
     <EventsComponent {events} />
     <TrainDeparturesComponent {trainDepartures} lines={['S5']} />
     <placeholder />
