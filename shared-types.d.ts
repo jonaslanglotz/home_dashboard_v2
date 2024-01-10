@@ -14,7 +14,7 @@ export interface WeatherData {
 
 export interface Task {
   title: string
-  due?: string
+  due: string
   priority: number
 }
 

@@ -29,9 +29,9 @@ export class TodoistTasksProvider extends DataProvider<Tasks> {
 
   async getData (): Promise<Tasks> {
     const rawTasks = await this._getRawTasks()
-    const relevantRawTasks = rawTasks.filter(rawTask => this._isTaskRelevant(rawTask))
+    const relevantRawTasks = rawTasks.filter(rawTask => this._isRawTaskRelevant(rawTask))
 
-    const convertedTasks = relevantRawTasks.map(rawTask => this._convertRawTask(rawTask))
+    const convertedTasks = relevantRawTasks.flatMap(rawTask => this._convertRawTask(rawTask))
     return convertedTasks
   }
 
@@ -39,17 +39,19 @@ export class TodoistTasksProvider extends DataProvider<Tasks> {
     return await this.todoist.getTasks()
   }
 
-  _isTaskRelevant (rawTask: RawTask): boolean {
+  _isRawTaskRelevant (rawTask: RawTask): boolean {
     return rawTask.projectId === this.projectId &&
       !rawTask.isCompleted &&
       rawTask.due != null
   }
 
-  _convertRawTask (rawTask: RawTask): Task {
-    return {
+  _convertRawTask (rawTask: RawTask): Task[] {
+    if (rawTask.due == null) { return [] }
+
+    return [{
       title: rawTask.content,
       due: rawTask.due?.datetime ?? rawTask.due?.date,
       priority: rawTask.priority
-    }
+    }]
   }
 }
