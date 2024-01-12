@@ -117,3 +117,11 @@ export class TibberEnergyPricesProvider extends DataProvider<EnergyPrices> {
     return energyPrices
   }
 }
+
+export interface EnvConfigurationValues {
+  TIBBER_API_KEY: string
+}
+
+export const fromEnv = (env: EnvConfigurationValues): TibberEnergyPricesProvider => new TibberEnergyPricesProvider({
+  apiKey: env.TIBBER_API_KEY
+})

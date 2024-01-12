@@ -1,10 +1,10 @@
 import { TodoistTasksProvider } from '../../../../src/data/data-providers/todoist'
 
 import 'dotenv/config'
-import { cleanEnv, str } from 'envalid'
+import { readEnv, str } from '../../../../src/env/'
 import { log } from '../../../../src/utils/log'
 
-const env = cleanEnv(process.env, {
+const env = readEnv(process.env, {
   TODOIST_API_KEY: str(),
   TODOIST_PROJECT_ID: str()
 })

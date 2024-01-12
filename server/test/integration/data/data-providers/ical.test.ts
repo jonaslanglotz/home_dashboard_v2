@@ -1,10 +1,10 @@
 import 'dotenv/config'
-import { cleanEnv, num, str } from 'envalid'
+import { readEnv, str, int } from '../../../../src/env/'
 import { IcalEventsProvider } from '../../../../src/data/data-providers/ical'
 
-const env = cleanEnv(process.env, {
+const env = readEnv(process.env, {
   ICAL_CALENDAR_URL: str(),
-  ICAL_EVENT_TIME_SPAN_DAYS: num()
+  ICAL_EVENT_TIME_SPAN_DAYS: int()
 })
 
 describe('IcalEventsProvider', function () {

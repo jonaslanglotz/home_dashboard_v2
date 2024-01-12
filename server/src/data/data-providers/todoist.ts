@@ -53,3 +53,13 @@ export class TodoistTasksProvider extends DataProvider<Tasks> {
     }
   }
 }
+
+export interface EnvConfigurationValues {
+  TODOIST_API_KEY: string
+  TODOIST_PROJECT_ID: string
+}
+
+export const fromEnv = (env: EnvConfigurationValues): TodoistTasksProvider => new TodoistTasksProvider({
+  apiKey: env.TODOIST_API_KEY,
+  projectId: env.TODOIST_PROJECT_ID
+})

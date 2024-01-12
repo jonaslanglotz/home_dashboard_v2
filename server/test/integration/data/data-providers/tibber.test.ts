@@ -1,10 +1,10 @@
 import { TibberEnergyPricesProvider } from '../../../../src/data/data-providers/tibber'
 
 import 'dotenv/config'
-import { cleanEnv, str } from 'envalid'
+import { readEnv, str } from '../../../../src/env/'
 import { log } from '../../../../src/utils/log'
 
-const env = cleanEnv(process.env, {
+const env = readEnv(process.env, {
   TIBBER_API_KEY: str()
 })
 

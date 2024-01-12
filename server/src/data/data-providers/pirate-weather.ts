@@ -188,3 +188,15 @@ export class PirateWeatherDataProvider extends DataProvider<WeatherData> {
     }
   }
 }
+
+export interface EnvConfigurationValues {
+  PIRATE_WEATHER_API_KEY: string
+  PIRATE_WEATHER_LATITUDE: number
+  PIRATE_WEATHER_LONGITUDE: number
+}
+
+export const fromEnv = (env: EnvConfigurationValues): PirateWeatherDataProvider => new PirateWeatherDataProvider({
+  apiKey: env.PIRATE_WEATHER_API_KEY,
+  latitude: env.PIRATE_WEATHER_LATITUDE,
+  longitude: env.PIRATE_WEATHER_LONGITUDE
+})

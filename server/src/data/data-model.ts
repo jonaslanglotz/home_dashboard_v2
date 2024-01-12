@@ -3,14 +3,16 @@ import { logger } from '../utils/log'
 import { EventEmitter } from 'node:events'
 
 import type pino from 'pino'
-import { PirateWeatherDataProvider } from './data-providers/pirate-weather'
 import { env } from '../env'
 import { IntervalBasedDataProvider } from './interval-based-data-provider'
 import { type TrainDepartures, type Events, type Tasks, type WeatherData, type EnergyPrices } from '../../../shared-types'
-import { TodoistTasksProvider } from './data-providers/todoist'
-import { IcalEventsProvider } from './data-providers/ical'
-import { BvgTrainDeparturesProvider } from './data-providers/bvg'
-import { TibberEnergyPricesProvider } from './data-providers/tibber'
+
+import * as PirateWeatherDataProvider from './data-providers/pirate-weather'
+import * as TodoistTasksProvider from './data-providers/todoist'
+import * as IcalEventsProvider from './data-providers/ical'
+import * as BvgTrainDeparturesProvider from './data-providers/bvg'
+import * as TibberEnergyPricesProvider from './data-providers/tibber'
+import * as KostalEnergyUseDataProvider from './data-providers/kostal'
 
 interface DataState {
   WEATHER?: WeatherData
@@ -41,45 +43,57 @@ export class DataModel extends EventEmitter {
 
     this._log = logger.child({ module: this.constructor.name })
 
-    this.dataProviders = {
-      WEATHER: new IntervalBasedDataProvider(
-        new PirateWeatherDataProvider({
-          apiKey: env.PIRATE_WEATHER_API_KEY,
-          latitude: env.LATITUDE,
-          longitude: env.LONGITUDE
-        }),
-        env.WEATHER_DATA_FETCH_INTERVAL * 1000
-      ),
-      TASKS: new IntervalBasedDataProvider(
-        new TodoistTasksProvider({
-          apiKey: env.TODOIST_API_KEY,
-          projectId: env.TODOIST_PROJECT_ID
-        }),
-        env.TASKS_FETCH_INTERVAL * 1000
-      ),
-      EVENTS: new IntervalBasedDataProvider(
-        new IcalEventsProvider({
-          calendarUrl: env.ICAL_CALENDAR_URL,
-          eventTimeSpanDays: env.ICAL_EVENT_TIME_SPAN_DAYS
-        }),
-        env.EVENTS_FETCH_INTERVAL * 1000
-      ),
-      TRAIN_DEPARTURES: new IntervalBasedDataProvider(
-        new BvgTrainDeparturesProvider({
-          stationId: env.BVG_STATION_ID,
-          departureTimeSpanMinutes: env.BVG_DEPARTURE_TIME_SPAN_MINUTES
-        }),
-        env.TRAIN_DEPARTURES_FETCH_INTERVAL * 1000
-      ),
-      ENERGY_PRICES: new IntervalBasedDataProvider(
-        new TibberEnergyPricesProvider({
-          apiKey: env.TIBBER_API_KEY
-        }),
-        env.ENERGY_PRICES_FETCH_INTERVAL * 1000
+    this.dataProviders = this._createDataProviders()
+
+    this._connectDataProviders()
+  }
+
+  _createDataProviders (): Record<string, IntervalBasedDataProvider<any>> {
+    const dataProviders: Record<string, IntervalBasedDataProvider<any>> = {}
+
+    if (env.PIRATE_WEATHER !== undefined) {
+      dataProviders.WEATHER = new IntervalBasedDataProvider(
+        PirateWeatherDataProvider.fromEnv(env.PIRATE_WEATHER),
+        env.PIRATE_WEATHER.PIRATE_WEATHER_FETCH_INTERVAL * 1000
       )
     }
 
-    this._connectDataProviders()
+    if (env.TODOIST !== undefined) {
+      dataProviders.TASKS = new IntervalBasedDataProvider(
+        TodoistTasksProvider.fromEnv(env.TODOIST),
+        env.TODOIST.TODOIST_FETCH_INTERVAL * 1000
+      )
+    }
+
+    if (env.ICAL !== undefined) {
+      dataProviders.EVENTS = new IntervalBasedDataProvider(
+        IcalEventsProvider.fromEnv(env.ICAL),
+        env.ICAL.ICAL_FETCH_INTERVAL * 1000
+      )
+    }
+
+    if (env.BVG !== undefined) {
+      dataProviders.TRAIN_DEPARTURES = new IntervalBasedDataProvider(
+        BvgTrainDeparturesProvider.fromEnv(env.BVG),
+        env.BVG.BVG_FETCH_INTERVAL * 1000
+      )
+    }
+
+    if (env.TIBBER !== undefined) {
+      dataProviders.ENERGY_PRICES = new IntervalBasedDataProvider(
+        TibberEnergyPricesProvider.fromEnv(env.TIBBER),
+        env.TIBBER.TIBBER_FETCH_INTERVAL * 1000
+      )
+    }
+
+    if (env.KOSTAL !== undefined) {
+      dataProviders.ENERGY_USE_DATA = new IntervalBasedDataProvider(
+        KostalEnergyUseDataProvider.fromEnv(env.KOSTAL),
+        env.KOSTAL.KOSTAL_FETCH_INTERVAL * 1000
+      )
+    }
+
+    return dataProviders
   }
 
   start (): void {
