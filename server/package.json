@@ -36,6 +36,7 @@
     "envalid": "^8.0.0",
     "hafas-client": "^6.2.0",
     "luxon": "^3.4.4",
+    "modbus-serial": "^8.0.16",
     "node-ical": "^0.17.1",
     "pino": "^8.17.0",
     "pino-pretty": "^10.2.3",
