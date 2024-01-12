@@ -98,3 +98,13 @@ export class BvgTrainDeparturesProvider extends DataProvider<TrainDepartures> {
     }
   }
 }
+
+export interface EnvConfigurationValues {
+  BVG_STATION_ID: string
+  BVG_DEPARTURE_TIME_SPAN_MINUTES: number
+}
+
+export const fromEnv = (env: EnvConfigurationValues): BvgTrainDeparturesProvider => new BvgTrainDeparturesProvider({
+  stationId: env.BVG_STATION_ID,
+  departureTimeSpanMinutes: env.BVG_DEPARTURE_TIME_SPAN_MINUTES
+})

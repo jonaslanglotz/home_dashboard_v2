@@ -124,3 +124,13 @@ export class IcalEventsProvider extends DataProvider<Events> {
     return rawEvent.datetype === 'date-time'
   }
 }
+
+export interface EnvConfigurationValues {
+  ICAL_CALENDAR_URL: string
+  ICAL_EVENT_TIME_SPAN_DAYS: number
+}
+
+export const fromEnv = (env: EnvConfigurationValues): IcalEventsProvider => new IcalEventsProvider({
+  calendarUrl: env.ICAL_CALENDAR_URL,
+  eventTimeSpanDays: env.ICAL_EVENT_TIME_SPAN_DAYS
+})

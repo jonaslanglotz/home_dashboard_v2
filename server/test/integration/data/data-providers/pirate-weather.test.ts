@@ -1,13 +1,13 @@
 import { PirateWeatherDataProvider } from '../../../../src/data/data-providers/pirate-weather'
 
 import 'dotenv/config'
-import { cleanEnv, num, str } from 'envalid'
+import { readEnv, str, float } from '../../../../src/env/'
 import { log } from '../../../../src/utils/log'
 
-const env = cleanEnv(process.env, {
+const env = readEnv(process.env, {
   PIRATE_WEATHER_API_KEY: str(),
-  LATITUDE: num(),
-  LONGITUDE: num()
+  LATITUDE: float(),
+  LONGITUDE: float()
 })
 
 describe('PirateWeatherDataProvider', function () {

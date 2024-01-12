@@ -60,13 +60,6 @@ export class KostalEnergyUseDataProvider extends DataProvider<EnergyUseData> {
     }
   }
 
-  _string (registers: number[]): string {
-    return registers
-      .flatMap(register => [(register & 0b1111111100000000) >> 8, register & 0b11111111])
-      .map(charPoint => String.fromCharCode(charPoint))
-      .join('')
-  }
-
   _int32 (registers: number[]): number {
     const bits = registers
       .slice(0, 2)
@@ -89,3 +82,13 @@ export class KostalEnergyUseDataProvider extends DataProvider<EnergyUseData> {
     return register >> 0
   }
 }
+
+export interface EnvConfigurationValues {
+  KOSTAL_MODBUS_ADDRESS: string
+  KOSTAL_MODBUS_PORT: number
+}
+
+export const fromEnv = (env: EnvConfigurationValues): KostalEnergyUseDataProvider => new KostalEnergyUseDataProvider({
+  modbusAddress: env.KOSTAL_MODBUS_ADDRESS,
+  modbusPort: env.KOSTAL_MODBUS_PORT
+})

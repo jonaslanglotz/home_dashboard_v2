@@ -1,11 +1,12 @@
 import 'dotenv/config'
-import { cleanEnv, num, str } from 'envalid'
+
 import { BvgTrainDeparturesProvider } from '../../../../src/data/data-providers/bvg'
 import { log } from '../../../../src/utils/log'
+import { readEnv, str, int } from '../../../../src/env/'
 
-const env = cleanEnv(process.env, {
+const env = readEnv(process.env, {
   BVG_STATION_ID: str(),
-  BVG_DEPARTURE_TIME_SPAN_MINUTES: num()
+  BVG_DEPARTURE_TIME_SPAN_MINUTES: int()
 })
 
 describe('BvgTrainDeparturesProvider', function () {

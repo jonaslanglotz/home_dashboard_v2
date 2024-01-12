@@ -1,10 +1,10 @@
 import 'dotenv/config'
-import { cleanEnv, num, str } from 'envalid'
+import { readEnv, str, int } from '../../../../src/env/'
 import { KostalEnergyUseDataProvider } from '../../../../src/data/data-providers/kostal'
 
-const env = cleanEnv(process.env, {
+const env = readEnv(process.env, {
   KOSTAL_MODBUS_ADDRESS: str(),
-  KOSTAL_MODBUS_PORT: num()
+  KOSTAL_MODBUS_PORT: int()
 })
 
 describe('KostalEnergyUseProvider', function () {
