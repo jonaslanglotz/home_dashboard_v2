@@ -4,8 +4,8 @@
 
   import { WSConnection } from '$lib/wsConnection'
 
-  import { eventsStore, tasksStore, trainDeparturesStore, weatherDataStore } from '$lib/stores'
-  import type { WeatherData, Events, TrainDepartures, Tasks } from '../../../shared-types'
+  import { energyPricesStore, energyUseDataStore, eventsStore, tasksStore, trainDeparturesStore, weatherDataStore } from '$lib/stores'
+  import type { WeatherData, Events, TrainDepartures, Tasks, EnergyPrices, EnergyUseData } from '../../../shared-types'
 
   let ws: WSConnection | undefined
   if (browser) {
@@ -33,6 +33,16 @@
 
   ws?.addEventListener('TASKS', ((event: CustomEvent) => {
     tasksStore.set(event.detail?.data as Tasks)
+  // eslint-disable-next-line no-undef
+  }) as EventListener)
+
+  ws?.addEventListener('ENERGY_PRICES', ((event: CustomEvent) => {
+    energyPricesStore.set(event.detail?.data as EnergyPrices)
+  // eslint-disable-next-line no-undef
+  }) as EventListener)
+
+  ws?.addEventListener('ENERGY_USE_DATA', ((event: CustomEvent) => {
+    energyUseDataStore.set(event.detail?.data as EnergyUseData)
   // eslint-disable-next-line no-undef
   }) as EventListener)
 

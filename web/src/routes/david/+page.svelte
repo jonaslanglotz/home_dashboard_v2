@@ -4,8 +4,9 @@
     import EventsComponent from '$lib/components/events/Events.svelte'
     import TrainDeparturesComponent from '$lib/components/trainDepartures/TrainDepartures.svelte'
 
-    import { eventsStore, weatherDataStore, trainDeparturesStore } from '$lib/stores'
-    import type { WeatherData, Events, TrainDepartures } from '../../../../shared-types'
+    import { eventsStore, weatherDataStore, trainDeparturesStore, energyPricesStore, energyUseDataStore } from '$lib/stores'
+    import type { WeatherData, Events, TrainDepartures, EnergyPrices, EnergyUseData } from '../../../../shared-types'
+    import Energy from '$lib/components/energy/Energy.svelte'
 
     let weatherData: WeatherData | undefined
     weatherDataStore.subscribe(value => {
@@ -21,9 +22,19 @@
     trainDeparturesStore.subscribe(value => {
       trainDepartures = value
     })
+
+    let energyPrices: EnergyPrices | undefined
+    energyPricesStore.subscribe(value => {
+      energyPrices = value
+    })
+
+    let energyUseData: EnergyUseData | undefined
+    energyUseDataStore.subscribe(value => {
+      energyUseData = value
+    })
 </script>
 
-<div class="w-screen h-screen p-4 overflow-hidden">
+<div class="w-screen h-screen flex gap-4 p-4 overflow-hidden">
   <div class="flex flex-col w-2/3 h-full gap-4">
     <div class="grid grid-cols-2 gap-4">
       <Clock />
@@ -33,5 +44,8 @@
       <EventsComponent {events}/>
       <TrainDeparturesComponent {trainDepartures} lines={['S5', 'RB26']}/>
     </div>
+  </div>
+  <div class="flex w-1/3 h-full">
+      <Energy {energyPrices} {energyUseData} />
   </div>
 </div>
