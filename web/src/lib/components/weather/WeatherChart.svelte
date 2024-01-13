@@ -3,11 +3,10 @@
   import { select } from 'd3-selection'
   import WeatherChartAxis from './WeatherChartAxis.svelte'
   import type { WeatherData } from '../../../../../shared-types'
-  
+
   export let weatherData: WeatherData
   export let viewboxWidth = 200
   export let viewboxHeight = 80
-
 
   let dates: Date[]
   let temperatures: number[]
@@ -19,18 +18,28 @@
 
   const hourLabelFormat = timeFormat('%_H:%M')
 
+  function extentWithMinimumWidth(iterable: Iterable<number>, minWidth: number): [number, number] {
+    const realExtent = extent(iterable) 
+
+    if (realExtent[0] === undefined) { return [0, minWidth]}
+
+    const extentWidth = realExtent[1] - realExtent[0]
+    const extentExtension = Math.max(0, minWidth - extentWidth) / 2
+
+    return [realExtent[0] - extentExtension, realExtent[1] + extentExtension]
+  }
+
   // We can cast here, since extent will only return [undefined, undefined] when the input array
   // contains no comparable values, which we can guarantee it will not
   let dateExtent: [Date, Date]
   let temperatureExtent: [number, number]
   let precipitationExtent: [number, number]
-  $: dateExtent = extent(dates) as [Date, Date]
-  $: temperatureExtent = extent(temperatures) as [number, number]
-  $: precipitationExtent = extent(precipitations) as [number, number]
 
-  // Ensure that the extent has a non zero width (so that the bars are always visible)
-  $: temperatureExtent[1] += 0.01
+  $: dateExtent = extent(dates) as [Date, Date]
+  $: temperatureExtent = extentWithMinimumWidth(temperatures, 5)
+  $: precipitationExtent = extent(precipitations) as [number, number]
   $: precipitationExtent[1] += 1
+  $: console.log(temperatureExtent)
 
   $: xScaleTemp = scaleTime()
     .domain(dateExtent)
