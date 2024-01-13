@@ -2,7 +2,7 @@
 	import type { Task } from '../../../../../shared-types'
 	import { Calendar2, Clock } from 'svelte-bootstrap-icons'
   import {marked} from 'marked'
-    import { dateString } from '$lib/dateString'
+  import { dateString } from '$lib/dateString'
 
   export let task: Task
 
@@ -75,6 +75,7 @@
 <div class="flex p-2 mb-2 bg-white shadow-lg rounded-md">
   <div class="rounded-full w-2.5 h-2.5 border-[0.05rem] {taskBorderColor} {taskBgColor} mr-1 mt-[0.06rem] flex-shrink-0" />
   <div class="flex flex-col">
+    <!-- eslint-disable-next-line svelte/no-at-html-tags -->
     <span class="text-xs leading-none">{@html marked.parse(task.title)}</span>
     <span class="flex items-center text-[0.5rem] {isTaskInPast(task) ? 'text-red-400' : 'text-slate-700'}">
       {#if isTaskInPast(task) && !isTaskToday(task) }
