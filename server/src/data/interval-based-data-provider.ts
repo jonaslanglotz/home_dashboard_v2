@@ -65,7 +65,8 @@ export class IntervalBasedDataProvider<T> extends EventEmitter {
       const data = await this.dataProvider.getData()
       this.emit(IntervalBasedDataProvider.DATA_EVENT, data)
     } catch (error) {
-      this._log.error({ error }, `#getData of ${this.dataProvider.constructor.name} failed with error`)
+      const message = error instanceof Error ? error.message : undefined
+      this._log.error({ message, error }, `#getData of ${this.dataProvider.constructor.name} failed with error`)
     }
   }
 }

@@ -1,7 +1,8 @@
 import { DataProvider } from '../data-provider'
 import type { Event, Events } from '../../../../shared-types'
 import { DashboardError } from '../../utils/dashboard-error'
-import Ical from 'node-ical'
+import Ical, { type VEvent } from 'node-ical'
+import { DateTime } from 'luxon'
 
 interface Options {
   calendarUrl: string
@@ -41,6 +42,8 @@ export class IcalEventsProvider extends DataProvider<Events> {
   calendarUrl: string
   eventTimeSpanDays: number
 
+  _calendarComponents: Ical.CalendarComponent[] | undefined
+
   constructor (options: Options) {
     super()
 
@@ -71,8 +74,31 @@ export class IcalEventsProvider extends DataProvider<Events> {
 
   _parseIcalData (icsData: string): Ical.VEvent[] {
     const data = Ical.sync.parseICS(icsData)
-    const calendarComponents = Object.values(data)
-    return calendarComponents.filter(calendarComponent => calendarComponent.type === 'VEVENT') as Ical.VEvent[]
+    this._calendarComponents = Object.values(data)
+    return this._calendarComponents.filter(calendarComponent => calendarComponent.type === 'VEVENT') as Ical.VEvent[]
+  }
+
+  _correctStartDates (rrule: NonNullable<VEvent['rrule']>, dates: Date[]): Date[] {
+    // Get the timezone identifier from the rrule object
+    const tzid = rrule.origOptions.tzid
+
+    if (tzid == null || rrule.origOptions.dtstart == null) { return dates }
+
+    // Get the original start date and UTC offset
+    const originalDate = new Date(rrule.origOptions.dtstart)
+    const originalTzDate = DateTime.fromJSDate(originalDate, { zone: tzid })
+    const originalOffset = originalTzDate.offset
+
+    // Get the current UTC offset
+    const currentTzDate = DateTime.fromJSDate(new Date(), { zone: tzid })
+    const currentOffset = currentTzDate.offset
+
+    for (const date of dates) {
+      // Add the DST offset to the date. This is the bug in node-ical.
+      date.setHours(date.getHours() + (originalOffset - currentOffset) / 60)
+    }
+
+    return dates
   }
 
   _filterAndConvertRawEvent (rawEvent: Ical.VEvent): Event[] {
@@ -83,7 +109,11 @@ export class IcalEventsProvider extends DataProvider<Events> {
 
     if (this._rawEventHasTime(rawEvent)) {
       if (rawEvent.rrule != null) {
-        dates.push(...rawEvent.rrule.between(relevanceStart, relevanceEnd))
+        const rawDates = rawEvent.rrule.between(relevanceStart, relevanceEnd)
+        // The node-ical library does not take into account changes in the time zone
+        // due to daylight savings time. We need to manually correct this.
+        const correctedDates = this._correctStartDates(rawEvent.rrule, rawDates)
+        dates.push(...correctedDates)
       } else if (rawEvent.start > relevanceStart && rawEvent.start < relevanceEnd) {
         dates.push(rawEvent.start)
       }
