@@ -39,7 +39,7 @@ export class KostalEnergyUseDataProvider extends DataProvider<EnergyUseData> {
       this._modbusClient.setID(1)
     }
 
-    const data = await this._modbusClient.readInputRegisters(40960, 26)
+    const data = await this._modbusClient.readInputRegisters(40960, 27)
     return data.data
   }
 
@@ -48,7 +48,7 @@ export class KostalEnergyUseDataProvider extends DataProvider<EnergyUseData> {
     const solarInputOutputsWatts = this._uint32(rawData.slice(16, 18))
     const homeConsumptionWatts = this._int32(rawData.slice(22, 24))
     const batteryInputOutputWatts = this._int32(rawData.slice(24, 26))
-    const batteryChargePercentage = this._uint16(rawData[26])
+    const batteryChargePercentage = this._uint16(rawData[26]) / 100
 
     return {
       homeConsumptionWatts,
