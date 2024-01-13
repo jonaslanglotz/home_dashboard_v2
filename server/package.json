@@ -1,7 +1,8 @@
 {
   "scripts": {
     "dev": "npx nodemon ./src/main.ts",
-    "start": "ts-node ./src/main.ts",
+    "build": "tsc",
+    "start": "node ./dist/src/main.js",
     "test": "nyc -a mocha 'test/unit/**/*.test.ts'",
     "integration-test": "mocha 'test/integration/**/*.test.ts'"
   },
