@@ -30,7 +30,21 @@ export class BvgTrainDeparturesProvider extends DataProvider<TrainDepartures> {
     this.stationId = options.stationId
     this.departureTimeSpanMinutes = options.departureTimeSpanMinutes
 
-    this._hafasClient = Hafas.then(async (hafas) => hafas.createClient((await bvgProfile).profile as Profile, 'home_dashboard'))
+    this._hafasClient = Hafas.then(async (hafas) => {
+      const profile = (await bvgProfile).profile as any
+
+      profile.ver = '1.72'
+      profile.auth.aid = 'dVg4TZbW8anjx9ztPwe2uk4LVRi9wO'
+      profile.client = {
+        "id": "VBB",
+        "l": "vs_webapp",
+        "name": "webapp",
+        "type": "WEB",
+        "v": 10002
+      }
+        
+      return hafas.createClient(profile as Profile, 'home_dashboard')
+    })
   }
 
   async getData (): Promise<TrainDepartures> {
