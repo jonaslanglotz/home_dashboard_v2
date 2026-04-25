@@ -8,24 +8,14 @@
     return min + (percentage * difference)
   }
 
-  const roundToDecimals = (value: number, places: number) =>
-    Math.round(value * 10 ** places) / 10 ** places
+  const wattString = (watts: number) =>
+    Math.round(Math.abs(watts)).toLocaleString()
 
-  const kwString = (watts: number) => {
-    const kwValue = Math.abs(watts) / 1000.0
-    const roundedValue = roundToDecimals(kwValue, 1)
-
-    return roundedValue.toLocaleString(undefined, {
-      maximumFractionDigits: 1,
-      maximumSignificantDigits: 2,
-    })
-  }
-
-  $: batteryString = kwString(energyUseData.batteryInputOutputWatts)
-  $: gridString = kwString(energyUseData.gridInputOutputWatts)
-  $: homeString = kwString(energyUseData.homeConsumptionWatts)
-  $: inverterString = kwString(energyUseData.inverterInputOutputWatts)
-  $: solarString = kwString(energyUseData.solarInputOutputsWatts)
+  $: batteryString = wattString(energyUseData.batteryInputOutputWatts)
+  $: gridString = wattString(energyUseData.gridInputOutputWatts)
+  $: homeString = wattString(energyUseData.homeConsumptionWatts)
+  $: inverterString = wattString(energyUseData.inverterInputOutputWatts)
+  $: solarString = wattString(energyUseData.solarInputOutputsWatts)
 
   const batteryFillMinWidth = 78.75
   const batteryFillMaxWidth = 132.5
@@ -41,7 +31,7 @@
           x="245"
           y="127.136"
           text-anchor="middle"
-          fill="black">{inverterString} kW</text
+          fill="black">{inverterString} W</text
         >
         {#if energyUseData.inverterInputOutputWatts > 0}
           <path
@@ -113,7 +103,7 @@
           fill="black"
           text-anchor="middle"
         >
-          {gridString} kW
+          {gridString} W
         </text>
         <g id="Group 3">
           <path
@@ -228,7 +218,7 @@
           y="110.136"
           id="SolarFigure"
           fill="black"
-          text-anchor="middle">{solarString} kW</text
+          text-anchor="middle">{solarString} W</text
         >
         {#if energyUseData.solarInputOutputsWatts > 0}
           <path
@@ -270,7 +260,7 @@
           fill="black"
           x="110"
           y="223.136"
-          text-anchor="middle">{batteryString} kW</text
+          text-anchor="middle">{batteryString} W</text
         >
         {#if energyUseData.batteryInputOutputWatts > 0}
           <path
@@ -314,7 +304,7 @@
           fill="black"
           x="380"
           y="223.136"
-          text-anchor="middle">{homeString} kW</text
+          text-anchor="middle">{homeString} W</text
         >
         <g id="house">
           <path
