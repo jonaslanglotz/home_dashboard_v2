@@ -5,7 +5,7 @@ import { EventEmitter } from 'node:events'
 import type pino from 'pino'
 import { env } from '../env'
 import { IntervalBasedDataProvider } from './interval-based-data-provider'
-import { type TrainDepartures, type Events, type Tasks, type WeatherData, type EnergyPrices } from '../../../shared-types'
+import { type TrainDepartures, type Events, type Tasks, type WeatherData, type EnergyPrices, type SpotifyOverlayState } from '../../../shared-types'
 
 import * as PirateWeatherDataProvider from './data-providers/pirate-weather'
 import * as TodoistTasksProvider from './data-providers/todoist'
@@ -13,6 +13,7 @@ import * as IcalEventsProvider from './data-providers/ical'
 import * as BvgTrainDeparturesProvider from './data-providers/bvg'
 import * as TibberEnergyPricesProvider from './data-providers/tibber'
 import * as KostalEnergyUseDataProvider from './data-providers/kostal'
+import * as SpotifyOverlayDataProvider from './data-providers/spotify-overlay'
 
 interface DataState {
   WEATHER?: WeatherData
@@ -20,7 +21,10 @@ interface DataState {
   EVENTS?: Events
   TRAIN_DEPARTURES?: TrainDepartures
   ENERGY_PRICES?: EnergyPrices
+  NOW_PLAYING_OVERLAY?: SpotifyOverlayState
 }
+
+type DashboardDataProvider<T> = EventEmitter & { start: () => void }
 
 /**
  * Stores all DataProviders for the project, and forwards emitted events from each.
@@ -36,7 +40,7 @@ export class DataModel extends EventEmitter {
 
   currentState: DataState = {}
 
-  dataProviders: Record<keyof DataState, IntervalBasedDataProvider<any>>
+  dataProviders: Partial<Record<keyof DataState, DashboardDataProvider<any>>>
 
   constructor () {
     super()
@@ -48,8 +52,8 @@ export class DataModel extends EventEmitter {
     this._connectDataProviders()
   }
 
-  _createDataProviders (): Record<string, IntervalBasedDataProvider<any>> {
-    const dataProviders: Record<string, IntervalBasedDataProvider<any>> = {}
+  _createDataProviders (): Record<string, DashboardDataProvider<any>> {
+    const dataProviders: Record<string, DashboardDataProvider<any>> = {}
 
     if (env.PIRATE_WEATHER !== undefined) {
       dataProviders.WEATHER = new IntervalBasedDataProvider(
@@ -93,15 +97,23 @@ export class DataModel extends EventEmitter {
       )
     }
 
+    if (env.SPOTIFY_OVERLAY !== undefined) {
+      dataProviders.NOW_PLAYING_OVERLAY = SpotifyOverlayDataProvider.fromEnv(env.SPOTIFY_OVERLAY)
+    }
+
     return dataProviders
   }
 
   start (): void {
-    Object.values(this.dataProviders).forEach(dataProvider => { dataProvider.start() })
+    Object.values(this.dataProviders).forEach(dataProvider => {
+      if (dataProvider == null) { return }
+      dataProvider.start()
+    })
   }
 
   _connectDataProviders (): void {
     for (const [type, dataProvider] of Object.entries(this.dataProviders)) {
+      if (dataProvider == null) { continue }
       dataProvider.on(IntervalBasedDataProvider.DATA_EVENT, data => {
         this.currentState[type as keyof typeof this.dataProviders] = data
         this.emit(DataModel.DATA_EVENT, type, data)

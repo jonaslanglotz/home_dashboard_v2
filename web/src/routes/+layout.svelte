@@ -4,8 +4,8 @@
 
   import { WSConnection } from '$lib/wsConnection'
 
-  import { energyPricesStore, energyUseDataStore, eventsStore, tasksStore, trainDeparturesStore, weatherDataStore } from '$lib/stores'
-  import type { WeatherData, Events, TrainDepartures, Tasks, EnergyPrices, EnergyUseData } from '../../../shared-types'
+  import { energyPricesStore, energyUseDataStore, eventsStore, spotifyOverlayStore, tasksStore, trainDeparturesStore, weatherDataStore } from '$lib/stores'
+  import type { WeatherData, Events, TrainDepartures, Tasks, EnergyPrices, EnergyUseData, SpotifyOverlayState } from '../../../shared-types'
 
   let ws: WSConnection | undefined
   if (browser) {
@@ -17,32 +17,44 @@
   $: ready = ws?.ready || false
 
   ws?.addEventListener('WEATHER', ((event: CustomEvent) => {
+    ready = true
     weatherDataStore.set(event.detail?.data as WeatherData)
   // eslint-disable-next-line no-undef
   }) as EventListener)
 
   ws?.addEventListener('EVENTS', ((event: CustomEvent) => {
+    ready = true
     eventsStore.set(event.detail?.data as Events)
   // eslint-disable-next-line no-undef
   }) as EventListener)
 
   ws?.addEventListener('TRAIN_DEPARTURES', ((event: CustomEvent) => {
+    ready = true
     trainDeparturesStore.set(event.detail?.data as TrainDepartures)
   // eslint-disable-next-line no-undef
   }) as EventListener)
 
   ws?.addEventListener('TASKS', ((event: CustomEvent) => {
+    ready = true
     tasksStore.set(event.detail?.data as Tasks)
   // eslint-disable-next-line no-undef
   }) as EventListener)
 
   ws?.addEventListener('ENERGY_PRICES', ((event: CustomEvent) => {
+    ready = true
     energyPricesStore.set(event.detail?.data as EnergyPrices)
   // eslint-disable-next-line no-undef
   }) as EventListener)
 
   ws?.addEventListener('ENERGY_USE_DATA', ((event: CustomEvent) => {
+    ready = true
     energyUseDataStore.set(event.detail?.data as EnergyUseData)
+  // eslint-disable-next-line no-undef
+  }) as EventListener)
+
+  ws?.addEventListener('NOW_PLAYING_OVERLAY', ((event: CustomEvent) => {
+    ready = true
+    spotifyOverlayStore.set(event.detail?.data as SpotifyOverlayState)
   // eslint-disable-next-line no-undef
   }) as EventListener)
 

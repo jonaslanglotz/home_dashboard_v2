@@ -4,9 +4,10 @@
     import EventsComponent from '$lib/components/events/Events.svelte'
     import TrainDeparturesComponent from '$lib/components/trainDepartures/TrainDepartures.svelte'
     import TasksComponent from '$lib/components/tasks/Tasks.svelte'
+    import NowPlayingOverlay from '$lib/components/nowPlaying/NowPlayingOverlay.svelte'
 
-    import { weatherDataStore, eventsStore, trainDeparturesStore, tasksStore } from '$lib/stores'
-    import type { WeatherData, Events, TrainDepartures, Tasks } from '../../../../shared-types'
+    import { weatherDataStore, eventsStore, trainDeparturesStore, tasksStore, spotifyOverlayStore } from '$lib/stores'
+    import type { WeatherData, Events, TrainDepartures, Tasks, SpotifyOverlayState } from '../../../../shared-types'
 
     let weatherData: WeatherData | undefined
     weatherDataStore.subscribe(value => {
@@ -27,17 +28,26 @@
     tasksStore.subscribe(value => {
       tasks = value
     })
+
+    let spotifyOverlay: SpotifyOverlayState | undefined
+    spotifyOverlayStore.subscribe(value => {
+      spotifyOverlay = value
+    })
 </script>
 
-<div class="w-screen h-screen flex flex-col overflow-hidden p-4 gap-4">
-  <div class="flex h-40 gap-4">
-    <Clock />
-    <Weather {weatherData} />
+{#if spotifyOverlay?.isVisible && spotifyOverlay.track}
+  <NowPlayingOverlay overlay={spotifyOverlay} />
+{:else}
+  <div class="w-screen h-screen flex flex-col overflow-hidden p-4 gap-4">
+    <div class="flex h-40 gap-4">
+      <Clock />
+      <Weather {weatherData} />
+    </div>
+    <div class="grid grid-cols-2 auto-rows-fr gap-4 min-h-0">
+      <TasksComponent {tasks} />
+      <EventsComponent {events} />
+      <TrainDeparturesComponent {trainDepartures} lines={['S5']} />
+      <placeholder />
+    </div>
   </div>
-  <div class="grid grid-cols-2 auto-rows-fr gap-4 min-h-0">
-    <TasksComponent {tasks} />
-    <EventsComponent {events} />
-    <TrainDeparturesComponent {trainDepartures} lines={['S5']} />
-    <placeholder />
-  </div>
-</div>
+{/if}

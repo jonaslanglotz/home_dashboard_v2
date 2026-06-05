@@ -54,3 +54,20 @@ export interface EnergyUseData {
   gridInputOutputWatts: number
 }
 
+export interface SpotifyTrack {
+  id: string,
+  title: string,
+  album: string,
+  albumArtUrl?: string,
+  artists: string[],
+  durationMs: number,
+  progressMs: number,
+  isPlaying: boolean,
+  trackUrl?: string
+}
+
+export interface SpotifyOverlayState {
+  isVisible: boolean,
+  lastUpdated: number,
+  track?: SpotifyTrack
+}
